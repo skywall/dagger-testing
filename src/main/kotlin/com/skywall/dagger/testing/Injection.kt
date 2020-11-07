@@ -6,11 +6,11 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-open class PrinterModule {
+class PrinterModule {
 
     @Provides
     @Singleton
-    open fun printer(display: Display): Printer = Printer(display)
+    fun printer(display: Display): Printer = Printer(display)
 }
 
 @Module

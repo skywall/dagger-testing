@@ -1,11 +1,28 @@
 package com.skywall.dagger.testing
 
+import dagger.Component
+import dagger.Module
+import dagger.Provides
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
+import javax.inject.Singleton
 
-class TestPrinterModule(private val printer: Printer) : PrinterModule() {
-    override fun printer(display: Display) = printer
+@Module
+class TestPrinterModule(private val printer: Printer) {
+
+    @Provides
+    @Singleton
+    fun printer() = printer
+}
+
+@Singleton
+@Component(modules = [
+    TicketMachineModule::class,
+    TestPrinterModule::class
+])
+interface TestTicketMachineComponent {
+    val ticketMachine: TicketMachine
 }
 
 class TicketMachineTest {
@@ -14,8 +31,8 @@ class TicketMachineTest {
 
     @Test
     fun `given ticket machine when adult ticket selected and paid then ticket printed`() {
-        val ticketMachine = DaggerTicketMachineComponent.builder()
-            .printerModule(TestPrinterModule(printerMock))
+        val ticketMachine = DaggerTestTicketMachineComponent.builder()
+            .testPrinterModule(TestPrinterModule(printerMock))
             .build()
             .ticketMachine
 
