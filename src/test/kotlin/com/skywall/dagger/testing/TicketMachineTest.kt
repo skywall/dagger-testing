@@ -1,27 +1,25 @@
 package com.skywall.dagger.testing
 
+import dagger.BindsInstance
 import dagger.Component
-import dagger.Module
-import dagger.Provides
 import io.mockk.mockk
 import io.mockk.verify
 import org.junit.jupiter.api.Test
 import javax.inject.Singleton
 
-@Module
-class TestPrinterModule(private val printer: Printer) {
-
-    @Provides
-    @Singleton
-    fun printer() = printer
-}
-
 @Singleton
 @Component(modules = [
     TicketMachineModule::class,
-    TestPrinterModule::class
 ])
 interface TestTicketMachineComponent {
+
+    @Component.Factory
+    interface Factory {
+        fun create(
+            @BindsInstance printer: Printer
+        ): TestTicketMachineComponent
+    }
+
     val ticketMachine: TicketMachine
 }
 
@@ -31,9 +29,8 @@ class TicketMachineTest {
 
     @Test
     fun `given ticket machine when adult ticket selected and paid then ticket printed`() {
-        val ticketMachine = DaggerTestTicketMachineComponent.builder()
-            .testPrinterModule(TestPrinterModule(printerMock))
-            .build()
+        val ticketMachine = DaggerTestTicketMachineComponent.factory()
+            .create(printerMock)
             .ticketMachine
 
         ticketMachine.selectTicket(TicketType.ADULT)
