@@ -6,11 +6,15 @@ import dagger.Provides
 import javax.inject.Singleton
 
 @Module
-class TicketMachineModule {
+open class PrinterModule {
 
     @Provides
     @Singleton
-    fun printer(display: Display) = Printer(display)
+    open fun printer(display: Display): Printer = Printer(display)
+}
+
+@Module
+class TicketMachineModule {
 
     @Singleton
     @Provides
@@ -23,7 +27,8 @@ class TicketMachineModule {
 
 @Singleton
 @Component(modules = [
-    TicketMachineModule::class
+    TicketMachineModule::class,
+    PrinterModule::class
 ])
 interface TicketMachineComponent {
     val ticketMachine: TicketMachine
